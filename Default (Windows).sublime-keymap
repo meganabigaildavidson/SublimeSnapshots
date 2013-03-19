@@ -1,0 +1,4 @@
+[
+	{ "keys": ["ctrl+shift+b"], "command": "list_snapshots" },
+	{ "keys": ["ctrl+shift+c"], "command": "create_snapshot" }
+]

@@ -1,0 +1,37 @@
+[
+    {
+        "caption": "Snapshots",
+        "mnemonic": "n",
+        "id": "snapshots",
+        "children":
+        [
+            {
+                "command": "list_snapshots",
+                "caption": "View Snapshots"
+            },
+            {
+                "command": "create_snapshot",
+                "caption": "Create Snapshot"
+            },
+            {
+                "command": "prune_snapshots",
+                "caption": "Prune snapshots"
+            },
+            { "caption": "-" },
+            {
+            "command": "open_file", "args":
+                {
+                    "file": "${packages}/Snapshots/Snapshots.sublime-settings"
+                },
+                "caption": "Settings – Default"
+            },
+            {
+                "command": "open_file", "args":
+                {
+                    "file": "${packages}/User/Snapshots.sublime-settings"
+                },
+                "caption": "Settings – User"
+            }
+        ]
+    }
+]
