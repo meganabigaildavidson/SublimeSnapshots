@@ -20,8 +20,8 @@ General configuration options:
   - `display_limit `: The number of files to display in the view snapshots list (lower shows less files but faster).
   - `quick_view `: true | false - If true then the snapshot view will open in the same window as the original file
   - `exclude_dir`: A list of folders to not automatically backup
-  - `exlude_files `: A list of filenames to not automatically backup
-  - `exlude_extensions `: A list of filetypes to not automatically backup
+  - `exclude_files `: A list of filenames to not automatically backup
+  - `exclude_extensions `: A list of filetypes to not automatically backup
 
 
 Hotkeys:

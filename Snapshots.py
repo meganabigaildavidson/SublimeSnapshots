@@ -153,14 +153,14 @@ class Snapshots(sublime_plugin.EventListener):
 		# get the exclude setting values
 		settings = sublime.load_settings('Snapshots.sublime-settings')
 		exclude_dir = settings.get("exclude_dir")
-		exlude_files = settings.get("exlude_files")
-		exlude_extensions = settings.get("exlude_extensions")
+		exclude_files = settings.get("exclude_files")
+		exclude_extensions = settings.get("exclude_extensions")
 
 		# get the file extension and parent path
 		parent_dir, extension = os.path.splitext(file_name)
 
 		# see if the files should be excluded
-		if extension in exlude_extensions or parent_dir in exclude_dir or file_name in exlude_files:
+		if extension in exclude_extensions or parent_dir in exclude_dir or file_name in exclude_files:
 			exclude = True
 
 		return exclude
@@ -475,7 +475,7 @@ class ListSnapshotsCommand(sublime_plugin.TextCommand):
 			return "%1d secs" % (seconds)
 		elif days == 0 and hours == 0 and minutes == 1 and seconds == 0:
 			return "%01d min" % (minutes)
-		elif days == 0 and hours == 0: 
+		elif days == 0 and hours == 0:
 			return "%01d mins, %01d secs" % (minutes, seconds)
 		elif days == 0 and hours == 1:
 			return "%01d hr" % (hours)
