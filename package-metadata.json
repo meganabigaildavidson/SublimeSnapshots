@@ -1,5 +1,5 @@
 {
-	"url": "http://www.insanekitty.co.uk", 
-	"version": "0.5", 
-	"description": "Automated backup when a file has been saved, with simple file backup archive viewer and automatic pruning of old backups after 14 days"
+	"url": "http://www.insanekitty.co.uk",
+	"version": "0.7.2",
+	"description": "Automated backup when a file has been saved, with simple file backup archive viewer"
 }

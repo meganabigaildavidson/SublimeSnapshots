@@ -1,0 +1,14 @@
+[
+    { "caption": "-" },
+    {
+        "caption": "Snapshots",
+        "children": [{
+            "command": "create_snapshot",
+            "caption": "Create Snapshot"
+        }, {
+            "command": "list_snapshots",
+            "caption": "View Snapshots"
+        }]
+    },
+    { "caption": "-" }
+]

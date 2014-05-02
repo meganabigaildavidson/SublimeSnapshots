@@ -1,20 +1,23 @@
 {
 	// Set the backup base directory
-	"backup_dir" : "~/Documents/Sublime Text 2 Backups",
+	"backup_dir" : "~/Documents/Sublime Text Backups",
 
 	// This is the number of days to keep the backups for
 	"prune_backups_after_days" : 14, // 0 means to never prune
 
-	// Files larger than this many bytes won't get backed up (if 0 then we backup regardless of size).
+	// Files larger than this many bytes won't get backed up (if 0, then we backup regardless).
 	"max_backup_file_size_bytes": 262144, // = 256 KB,
 
 	// The number of copies to show in the backup list view (the last x amount of copies), the higher this is the slower it will be to display
-	"display_limit" : 20,
+	"display_limit" : 100,
+
+	// Displays error in a popup window (default is to let them display in the console)
+	"display_errors" : false,
 
 	// Turns auto saving on or off
 	"enabled" : true,
 
-	// if set to True then the backup file will open in the open in the same tab as the current file (like single clicking on the sidebar)
+	// if set to True then the backup file will open In the same tab as the current file (like single clicking on the sidebar)
 	"quick_view" : false,
 
 	// this is a list of directories not to descend into to backup (any files in these directories will be ignored)

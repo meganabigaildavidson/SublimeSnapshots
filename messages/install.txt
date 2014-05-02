@@ -1,0 +1,24 @@
+Thank you for installing Snapshots!
+
+
+Usage
+-----
+
+Select the file and choose from one of the following options
+
+* Create snapshot - This create a new snaphot of the current file in the Backup Directory/Snapshots folder
+* View snapshots - Shows a list of any automatically backed up files
+* Prune snapshots - Deletes any automatically backed up files according the 'prune_backups_after_days' settings (Defaults to 14 days)
+
+Shortcuts
+---------
+
+* Create a new snapshot: `Ctrl+Shift+c` (Linux/Windows) or `Cmd+Shift+c` (OS X).
+* View snapshots of current file: `Ctrl+Shift+b` (Linux/Windows) or `Cmd+Shift+b` (OS X).
+
+
+Author
+------
+
+Created by Megan Davidson [http://www.insanekitty.co.uk/].
+For more info, you can send email to me: snapshot-package@insanekitty.co.uk!

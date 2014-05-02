@@ -25,11 +25,11 @@ class Snapshots(sublime_plugin.EventListener):
 		buffer_file_name = view.file_name()
 		file_name = os.path.basename(buffer_file_name)
 
-        # stop processing if we cannot backup the file
+		# stop processing if we cannot backup the file
 		if self.can_backup(view) == False:
 			return
 
-        # check to see if we have the backup directory '2011-07-23'
+		# check to see if we have the backup directory '2011-07-23'
 		buffer_file_name = view.file_name()
 		backup_dir = self.get_backup_dir()
 
@@ -51,8 +51,8 @@ class Snapshots(sublime_plugin.EventListener):
 		# backup the file
 		try:
 			shutil.copy(buffer_file_name, backup_name)
-		except IOError as (errno, strerror):
-			self.log("I/O error({0}): {1}".format(errno, strerror))
+		except IOError as err:
+			self.log("I/O error({0}): {1}".format(err.errno, err.strerror))
 		except:
 			self.log("Unexpected error:", sys.exc_info()[0])
 		finally:
@@ -62,7 +62,7 @@ class Snapshots(sublime_plugin.EventListener):
 	def on_post_save(self, view):
 
 		"""When a file is saved, put a copy of the file into the
-        backup directory"""
+		backup directory"""
 
 		# stop processing if we cannot backup the file
 		if self.can_backup(view) == False:
@@ -71,7 +71,7 @@ class Snapshots(sublime_plugin.EventListener):
 		# we need to check to see how many weeks backup files they want to keep
 		self.prune_backups();
 
-        # check to see if we have the backup directory '2011-07-23'
+		# check to see if we have the backup directory '2011-07-23'
 		buffer_file_name = view.file_name()
 		backup_dir = self.get_backup_dir()
 
@@ -81,9 +81,8 @@ class Snapshots(sublime_plugin.EventListener):
 		if backup_name != None:
 			try:
 				shutil.copy(buffer_file_name, backup_name)
-
-			except IOError as (errno, strerror):
-				self.log("I/O error({0}): {1}".format(errno, strerror))
+			except IOError as err:
+				self.log("I/O error({0}): {1}".format(err.errno, err.strerror))
 			except:
 				self.log("Unexpected error:" + sys.exc_info()[0])
 			finally:
@@ -122,13 +121,13 @@ class Snapshots(sublime_plugin.EventListener):
 		for dirname, dirnames, filenames in os.walk(self.get_backup_dir_root()):
 			for directory in dirnames:
 				path = str(os.path.join(dirname, directory))
-				if os.path.isdir( path ) and  directory != 'snapshots':
+				if os.path.isdir( path ) and  directory != 'Snapshots':
 					dir_date = int(directory.replace('-', ''));
 					if ((now - dir_date) >= prune_backups_after_days):
 						try:
 							shutil.rmtree(path)
 							pruned_dirs = pruned_dirs + 1
-						except OSError, e:
+						except OSError as e:
 							self.log(e)
 
 		return str(pruned_dirs) + " snapshot directories pruned."
@@ -240,13 +239,12 @@ class Snapshots(sublime_plugin.EventListener):
 		if (backup_dir is None):
 			sublime.error_message('No backup dir specified in the settings')
 		else:
-
 			# check to see if the path starts with a ~ and use os.path.expanduser if so then we need to do something different for windows
 			if backup_dir.startswith('~'):
 				backup_dir = os.path.expanduser( backup_dir )
 
 			# os.sep = / and os.pathsep = : (work out which of they are using, then determine the path they are using)
-			backup_dir = backup_dir + os.sep + 'snapshots'
+			backup_dir = backup_dir + os.sep + 'Snapshots'
 
 			# make sure that we have a directory to write into
 			if not os.path.exists(backup_dir):
@@ -262,7 +260,13 @@ class Snapshots(sublime_plugin.EventListener):
 
 		"""Prints out a message to the Sublime console"""
 
-		print "Snapshots Log : " + str(message)
+		settings = sublime.load_settings('Snapshots.sublime-settings')
+		display_errors = settings.get("display_errors")
+
+		if display_errors == True:
+			sublime.error_message('Unable to create backup folder' + backup_dir)
+		else:
+			print("Log : %s", str(message))
 
 	def md5Checksum(self, filePath):
 
@@ -277,15 +281,13 @@ class Snapshots(sublime_plugin.EventListener):
 				if not data:
 					break
 				m.update(data)
-
 			digest =  m.hexdigest()
-		except IOError as (errno, strerror):
-			self.log("I/O error({0}): {1}".format(errno, strerror))
+		except IOError as err:
+			self.log("I/O error({0}): {1}".format(err.errno, err.strerror))
 		except:
 			self.log("Unexpected error:" + sys.exc_info()[0])
 		finally:
 			fh.close()
-
 		return digest
 
 	def timestamp_snapshot(self, file_name):
@@ -294,7 +296,7 @@ class Snapshots(sublime_plugin.EventListener):
 
 		now = datetime.datetime.today()
 		filepart, extensionpart = os.path.splitext(file_name)
-		return "%s (%04d-%02d-%02d-%02d-%02d-%02d)%s%s" % ( filepart, now.year, now.month, now.day, now.hour, now.minute, now.second, extensionpart,'.snapshot' )
+		return "%s (%04d-%02d-%02d-%02d-%02d-%02d)%s" % ( filepart, now.year, now.month, now.day, now.hour, now.minute, now.second, extensionpart )
 
 	def snapshot_dir(self, file_name):
 
@@ -345,23 +347,32 @@ class ListSnapshotsCommand(sublime_plugin.TextCommand):
 			return
 
 		# init code
+		date_file_list = []
 		self.backups = []
 		backup = Snapshots()
 
 		# get the current file in the buffer
 		current_file = os.path.basename( self.view.file_name() )
 		backup_root = backup.get_backup_dir_root()
+		snapshot_root = backup.get_snapshot_backup_dir()
 
-		# loop through each file in the direct and get it's creation time and path so we can sort later
-		date_file_list = []
+		# loop through each file in the backup directory
 		for dirname, dirnames, filenames in os.walk(backup_root):
 			for filename in filenames:
 				path = str(os.path.join(dirname, filename))
 				if os.path.isfile( path ): # avoid any symlinks and directories
-					date_file_tuple = int(os.path.getmtime( path )), path
+					date_file_tuple = int(os.path.getmtime( path )), path, 'backup'
 					date_file_list.append(date_file_tuple)
 
-	    # sort the modified / created date
+		# loop through each file in the snapshot directory
+		for dirname, dirnames, filenames in os.walk(snapshot_root):
+			for filename in filenames:
+				path = str(os.path.join(dirname, filename))
+				if os.path.isfile( path ): # avoid any symlinks and directories
+					date_file_tuple = int(os.path.getmtime( path )), path, 'snapshot'
+					date_file_list.append(date_file_tuple)
+
+		# sort the modified / created date
 		date_file_list.sort()
 		date_file_list.reverse()  # newest mod date now first
 
@@ -372,20 +383,19 @@ class ListSnapshotsCommand(sublime_plugin.TextCommand):
 			if len(self.backups) >= backup.display_limit():
 				break
 
-			ctime = f[0]; file_path = f[1]; filename = os.path.basename(file_path)
+			ctime = f[0]; file_path = f[1]; backup_type = f[2]; filename = os.path.basename(file_path)
 
 			# try to match on a non versioned file (i.e. the very first save)
 			match = re.search(r'\((\d{4}-\d{1,2}-\d{1,2})-\d{1,2}-\d{1,2}-\d{1,2}\)', filename)
 			if match == None and filename == current_file:
-				self.backups.append( self.get_formatted_backup_data(file_path, ctime))
+				self.backups.append( self.get_formatted_backup_data(file_path, ctime, backup_type))
 
 			# try to match on a versioned file
 			match2 = re.search(r'(.+)(\s\((\d{4}-\d{1,2}-\d{1,2})-\d{1,2}-\d{1,2}-\d{1,2}\))', filename)
 			if match2:
 				name, extension = os.path.splitext(filename)
 				if current_file == match2.group(1) + extension:
-					self.backups.append( self.get_formatted_backup_data(file_path, ctime) )
-
+					self.backups.append( self.get_formatted_backup_data(file_path, ctime, backup_type) )
 
 		# no backups found
 		if len(self.backups) == 0:
@@ -400,7 +410,8 @@ class ListSnapshotsCommand(sublime_plugin.TextCommand):
 					[
 						item['created'],
 						'Size: ' + str(item['size']),
-						'Filename: ' + item['filename']
+						'Filename: ' + item['filename'],
+						'Type: ' + item['type']
 					]
 				)
 
@@ -422,11 +433,12 @@ class ListSnapshotsCommand(sublime_plugin.TextCommand):
 				quick_view = settings.get("quick_view")
 
 				# open the file and make it read_only
-				if self.view.window():
+				window = sublime.active_window()
+				if window:
 					if quick_view == None or quick_view == False:
-						new_buffer = self.view.window().open_file(path)
+						new_buffer = window.open_file(path)
 					else:
-						new_buffer = self.view.window().open_file(path, sublime.TRANSIENT)
+						new_buffer = window.open_file(path, sublime.TRANSIENT)
 
 					# make it read_only so they cannot modify it
 					new_buffer.set_read_only(True)
@@ -463,7 +475,7 @@ class ListSnapshotsCommand(sublime_plugin.TextCommand):
 			return "%1d secs" % (seconds)
 		elif days == 0 and hours == 0 and minutes == 1 and seconds == 0:
 			return "%01d min" % (minutes)
-		elif days == 0 and hours == 0:
+		elif days == 0 and hours == 0: 
 			return "%01d mins, %01d secs" % (minutes, seconds)
 		elif days == 0 and hours == 1:
 			return "%01d hr" % (hours)
@@ -474,7 +486,7 @@ class ListSnapshotsCommand(sublime_plugin.TextCommand):
 		else:
 			return "%01d days" % (days)
 
-	def get_formatted_backup_data(self, file_path, ctimestamp):
+	def get_formatted_backup_data(self, file_path, ctimestamp, backup_type):
 
 		"""Returns a dictionary with the data to show in the quick panel in the display formats"""
 
@@ -501,9 +513,9 @@ class ListSnapshotsCommand(sublime_plugin.TextCommand):
 		return {
 			'size' : self.prettySize( os.path.getsize( file_path ) ),
 			'created' : display_date,
-			#'checksum' : Snapshots().md5Checksum( file_path ),
 			'filename' : os.path.basename(file_path),
-			'path' : file_path
+			'path' : file_path,
+			'type' : backup_type.capitalize()
 		}
 
 class PruneSnapshotsCommand(sublime_plugin.TextCommand):
@@ -541,11 +553,11 @@ class CreateSnapshotCommand(sublime_plugin.TextCommand):
 
 		backup = Snapshots()
 
-        # stop processing if we are disabled, not modified, 0 in size or in the settings exclusions
+		# stop processing if we are disabled, not modified, 0 in size or in the settings exclusions
 		if backup.is_enabled() == False or self.view.size() == 0:
 			return
 
-        # check to see if we have the backup directory '2011-07-23'
+		# check to see if we have the backup directory '2011-07-23'
 		buffer_file_name = self.view.file_name()
 		backup_dir = backup.get_snapshot_backup_dir()
 
@@ -564,7 +576,7 @@ class CreateSnapshotCommand(sublime_plugin.TextCommand):
 			try:
 				shutil.copy(buffer_file_name, backup_name)
 
-			except IOError as (errno, strerror):
-				backup.log("I/O error({0}): {1}".format(errno, strerror))
+			except IOError as err:
+				backup.log("I/O error({0}): {1}".format(err.errno, err.strerror))
 			except:
 				backup.log("Unexpected error:" + sys.exc_info()[0])
